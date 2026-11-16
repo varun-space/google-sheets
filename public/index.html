@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Work Queue · Video Ops</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Lora:wght@600&family=Sora:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/img/meda-partners-colour.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/env-banner.js"></script>
+</head>
+<body>
+  <main class="page">
+    <div class="toolbar">
+      <div class="grow">
+        <h1 id="title">Work queue</h1>
+        <div class="muted" id="subtitle"></div>
+      </div>
+      <div class="field hidden" id="viewAsWrap">
+        <label for="viewAs" id="viewAsLabel">View as</label>
+        <select id="viewAs"></select>
+      </div>
+      <button class="ghost" id="refreshBtn">↻ Refresh</button>
+      <button class="hidden" id="newBtn">＋ New request</button>
+    </div>
+
+    <div class="viewas-bar hidden" id="viewAsBar">
+      <span id="viewAsText"></span>
+      <button class="ghost sm" id="backBtn">← Back to everyone</button>
+    </div>
+
+    <div class="error-box hidden" id="errorBox"></div>
+
+    <div class="pills" id="pills"></div>
+
+    <div class="toolbar">
+      <div class="grow"><input type="search" id="search" aria-label="Search"></div>
+    </div>
+
+    <div class="card" id="tableCard">
+      <div class="loading"><div class="spinner"></div><span id="loadingText">Loading tasks…</span></div>
+    </div>
+  </main>
+
+  <!-- New request (admin). Dropdown options come from the server so they always match the Google Form exactly. -->
+  <dialog id="newDlg">
+    <form id="newForm" method="dialog">
+      <div class="m-head"><h2 id="newTitle">New request</h2><button type="button" class="ghost sm" data-close>✕</button></div>
+      <div class="m-body" id="newBody"></div>
+      <div class="m-foot">
+        <button type="button" class="ghost" data-close id="newCancel">Cancel</button>
+        <button type="submit" id="newSubmit">Create request</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/tasks-ui.js"></script>
+  <script src="/js/queue.js"></script>
+</body>
+</html>

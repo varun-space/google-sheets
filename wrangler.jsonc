@@ -1,0 +1,11 @@
+{
+  "name": "sheets-work",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-11-01",
+  "assets": { "directory": "./public", "html_handling": "auto-trailing-slash" },
+  "vars": { "SHEET_ID": "1rTVnoyeqNIbUI_rPJ9zO6IwsO8-6og4G-NvO87uWmwM" },
+  // Settings for `wrangler preview` builds. Previews also use the COPY sheet, never a live one.
+  "previews": {
+    "vars": { "SHEET_ID": "1rTVnoyeqNIbUI_rPJ9zO6IwsO8-6og4G-NvO87uWmwM" }
+  }
+}

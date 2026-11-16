@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login · Video Ops</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600&family=Sora:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/img/meda-partners-colour.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/env-banner.js"></script>
+</head>
+<body>
+  <main class="login-wrap">
+    <form class="login-card" id="loginForm" autocomplete="on">
+      <header><img src="/img/meda-partners-white.png" alt="MeDa Partners"></header>
+      <div class="body">
+        <div>
+          <h1>Video Ops Dashboard</h1>
+          <p>Pick your name to see your tasks.</p>
+        </div>
+
+        <div>
+          <label for="who">Who are you?</label>
+          <select id="who" required disabled>
+            <option value="">Loading names…</option>
+          </select>
+        </div>
+
+        <div id="pwBox" class="hidden">
+          <label for="pw">Admin password</label>
+          <input id="pw" type="password" autocomplete="current-password">
+        </div>
+
+        <button id="goBtn" type="submit" disabled>Log in</button>
+        <div class="form-msg" id="msg" role="alert"></div>
+      </div>
+    </form>
+  </main>
+  <footer class="site"><span>⚡ Built by MeDa Partners · Video Ops Dashboard</span><span>MeDa Partners Pvt Ltd | www.meda.partners</span></footer>
+
+  <script>
+    // Kept inline: the login page is the only page that runs without a session, so it doesn't load common.js.
+    const who = document.getElementById('who');
+    const pwBox = document.getElementById('pwBox');
+    const pw = document.getElementById('pw');
+    const btn = document.getElementById('goBtn');
+    const msg = document.getElementById('msg');
+    let fails = 0;
+    let lockedUntil = 0;
+
+    async function init() {
+      // Already logged in? Go straight to the queue.
+      const me = await fetch('/api/me').then((r) => r.json()).catch(() => ({}));
+      if (me.ok) { location.href = '/'; return; }
+
+      const res = await fetch('/api/editors').then((r) => r.json()).catch(() => ({ ok: false, msg: 'Network error.' }));
+      if (!res.ok) { who.innerHTML = '<option value="">Could not load names</option>'; msg.textContent = res.msg; return; }
+      who.innerHTML = '<option value="">— select your name —</option>' +
+        res.editors.map((n) => `<option></option>`).join('') + '<option value="__admin">🔐 Admin</option>';
+      // Set names via textContent so odd characters in the sheet can't inject markup.
+      [...who.options].slice(1, -1).forEach((o, i) => { o.value = res.editors[i]; o.textContent = res.editors[i]; });
+      who.disabled = false;
+    }
+
+    who.addEventListener('change', () => {
+      const admin = who.value === '__admin';
+      pwBox.classList.toggle('hidden', !admin);
+      pw.required = admin;
+      btn.disabled = !who.value;
+      msg.textContent = '';
+      if (admin) pw.focus();
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (Date.now() < lockedUntil) {
+        msg.textContent = `Too many wrong passwords. Try again in ${Math.ceil((lockedUntil - Date.now()) / 1000)} s.`;
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'Logging in…';
+      msg.textContent = '';
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name: who.value, password: pw.value }),
+      }).then((r) => r.json()).catch(() => ({ ok: false, msg: 'Network error.' }));
+
+      if (res.ok) { location.href = '/'; return; }
+      btn.disabled = false;
+      btn.textContent = 'Log in';
+      msg.textContent = res.msg || 'Login failed.';
+      if (who.value === '__admin') {
+        pw.select();
+        if (++fails >= 3) { fails = 0; lockedUntil = Date.now() + 30000; msg.textContent = 'Too many wrong passwords. Wait 30 seconds.'; }
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>

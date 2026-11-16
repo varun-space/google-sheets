@@ -1,0 +1,6 @@
+.dev.vars
+node_modules
+.wrangler
+
+# Google service-account key (never commit)
+mfb-app-*.json
